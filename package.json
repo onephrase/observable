@@ -1,0 +1,42 @@
+{
+  "name": "@onephrase/observable",
+  "title": "Observable",
+  "description": "Observable is a reactive object wrapper. Observe properties dynamically without having to define them upfront.",
+  "keywords": [
+    "Reactive",
+    "Observable",
+    "modules",
+    "stdlib",
+    "util"
+  ],
+  "homepage": "https://www.onephrase.dev",
+  "icon": "https://www.onephrase.dev/icon.svg",
+  "author": {
+    "name": "Oxford Harrison",
+    "email": "oxharriscreative@gmail.com"
+  },
+  "version": "0.0.0",
+  "license": "MIT",
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/onephrase/observable.git"
+  },
+  "main": "src/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+	"build": "webpack --config ../webpack.config.js",
+	"watch": "webpack --watch"
+  },
+  "dependencies": {
+    "@onephrase/commons": "^0.0.0",
+    "@onephrase/jsen": "^0.0.0"
+  },
+  "devDependencies": {
+    "webpack": "^4.41.0",
+    "webpack-cli": "^3.3.9"
+  },
+  "bugs": {
+    "url": "https://github.com/onephrase/observable/issues"
+  }
+}
