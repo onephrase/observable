@@ -23,8 +23,9 @@ const Event = class {
 	 */
 	constructor(params) {
 		this.$ = {
-			isPropagationStopped: false,
-			isDefaultPrevented: false,
+			propagationStopped: false,
+			defaultPrevented: false,
+			promisesInstance: null,
 			promises: [],
 		};
 		_each(params, (name, value) => {
@@ -38,7 +39,7 @@ const Event = class {
 	 * @return bool
 	 */
 	stopPropagation() {
-		this.$.isPropagationStopped = true;
+		this.$.propagationStopped = true;
 	}
 		
 	/**
@@ -46,8 +47,8 @@ const Event = class {
 	 *
 	 * @return bool
 	 */
-	get isPropagationStopped() {
-		return this.$.isPropagationStopped;
+	get propagationStopped() {
+		return this.$.propagationStopped;
 	}
 		
 	/**
@@ -57,7 +58,7 @@ const Event = class {
 	 * @return void
 	 */
 	preventDefault() {
-		this.$.isDefaultPrevented = true;
+		this.$.defaultPrevented = true;
 	}
 		
 	/**
@@ -65,8 +66,8 @@ const Event = class {
 	 *
 	 * @return bool
 	 */
-	get isDefaultPrevented() {
-		return this.$.isDefaultPrevented;
+	get defaultPrevented() {
+		return this.$.defaultPrevented;
 	}
 		
 	/**
@@ -81,6 +82,7 @@ const Event = class {
 			throw new Error('Event.promise() must be called with a Promise.');
 		}
 		this.$.promises.push(promise);
+		this.$.promisesInstance = null;
 	}
 		
 	/**
@@ -89,7 +91,10 @@ const Event = class {
 	 * @return Promise|null
 	 */
 	get promises() {
-		return this.$.promises.length ? Promise.all(this.$.promises) : null;
+		if (!this.$.promisesInstance && this.$.promises.length) {
+			this.$.promisesInstance = Promise.all(this.$.promises);
+		}
+		return this.$.promisesInstance;
 	}
 };
 

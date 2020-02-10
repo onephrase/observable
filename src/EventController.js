@@ -145,7 +145,7 @@ const EventController = class {
 		_concatUnique(this.$.currentlyFiring, eventNamesAntiRecursion)
 		// Initialize evteters for "return"
 		for (var i = 0; i < (this.$.listeners || []).length; i ++) {
-			if (e.isPropagationStopped) {
+			if (e.propagationStopped) {
 				continue;
 			}
 			var listener = this.$.listeners[i];
@@ -171,9 +171,9 @@ const EventController = class {
 			if (matches && this._shouldFire(listener, eventNames, e)) {
 				// Call listener...
 				var dispostn = this._doFire(listener, eventNames, e), proms;
-				if ((dispostn === false) || (dispostn instanceof Event && dispostn.isPropagationStopped)) {
+				if ((dispostn === false) || (dispostn instanceof Event && dispostn.propagationStopped)) {
 					e.stopPropagation();
-				} else if ((dispostn === false) || (dispostn instanceof Event && dispostn.isDefaultPrevented)) {
+				} else if ((dispostn === false) || (dispostn instanceof Event && dispostn.defaultPrevented)) {
 					e.preventDefault();
 				} else if ((dispostn instanceof Promise && (proms = dispostn))
 				|| (dispostn instanceof Event && (proms = dispostn.promises))) {
