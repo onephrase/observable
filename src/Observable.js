@@ -2,37 +2,24 @@
 /**
  * @imports
  */
-import Jsen, {
-	ArgumentsInterface,
-	CallInterface,
-	ReferenceInterface,
-	Contexts
-} from '@onephrase/jsen';
-import {
-	_isArray,
-	_isString,
-	_isObject,
-	_isFunction,
-	_isNumber,
-	_isNumeric,
-	_isObservable,
-	_proxy,
-	_isProxy,
-	_getProxyTarget,
-	_isUndefined,
-	_isNull
-} from '@onephrase/commons/src/Js.js';
-import {
-	_from,
-	_unique
-} from '@onephrase/commons/src/Arr.js';
-import {
-	_inherit,
-	_copy,
-	_each,
-	_even,
-	_get
-} from '@onephrase/commons/src/Obj.js';
+import _isNull from '@onephrase/commons/js/isNull.js';
+import _isString from '@onephrase/commons/js/isString.js';
+import _isArray from '@onephrase/commons/js/isArray.js';
+import _isObject from '@onephrase/commons/js/isObject.js';
+import _isNumber from '@onephrase/commons/js/isNumber.js';
+import _isNumeric from '@onephrase/commons/js/isNumeric.js';
+import _isFunction from '@onephrase/commons/js/isFunction.js';
+import _isObservable from '@onephrase/commons/js/isObservable.js';
+import _getProxyTarget from '@onephrase/commons/js/getProxyTarget.js';
+import _isProxy from '@onephrase/commons/js/isProxy.js';
+import _proxy from '@onephrase/commons/js/proxy.js';
+import _arrFrom from '@onephrase/commons/arr/from.js';
+import _unique from '@onephrase/commons/arr/unique.js';
+import _inherit from '@onephrase/commons/obj/inherit.js';
+import _copy from '@onephrase/commons/obj/copy.js';
+import _each from '@onephrase/commons/obj/each.js';
+import _even from '@onephrase/commons/obj/even.js';
+import _get from '@onephrase/commons/obj/get.js';
 import EventController from './EventController.js';
 
 /**
@@ -61,26 +48,6 @@ const Observable = class extends EventController {
 		_each(this.$.state, (prop, value) => {
 			this._incoming(prop, value);
 		});
-	}
-
-	/**
-	 * Sets a reference to the parent instance.
-	 *
-	 * @param object|null		offsetParent
-	 *
-	 * @return this
-	 */
-	setOffsetParent(offsetParent) {
-		this.$.offsetParent = offsetParent;
-	}
-
-	/**
-	 * Sets a reference to the parent instance.
-	 *
-	 * @return object|null
-	 */
-	getOffsetParent() {
-		return this.$.offsetParent;
 	}
 
 	/**
@@ -163,7 +130,7 @@ const Observable = class extends EventController {
 	 * @return null|false|Promise
 	 */
 	del(prop) {
-		var props = _from(prop);
+		var props = _arrFrom(prop);
 		var exits = [];
 		props.forEach(prop => {
 			if (prop in this.$.state) {
@@ -182,8 +149,6 @@ const Observable = class extends EventController {
 	/**
 	 * Evaluates a property name to see if it's a request for instance method
 	 * as against state property.
-	 *
-	 * This is especially useful for _jsenGetters.
 	 *
 	 * @param string			prop
 	 *
@@ -212,13 +177,6 @@ const Observable = class extends EventController {
 			return asOwnMethod;
 		}
 		// ----------------------
-		if (prop === '_') {
-			return this.getOffsetParent();
-		}
-		if (prop === '__') {
-			var parent = this.getOffsetParent();
-			return (parent ? parent.get('__') : parent) || parent;
-		}
 		var value = this.$.state[prop];
 		if (_isArray(this.$.state) && !_isNumeric(prop) && _isFunction(value)) {
 			return (...args) => {
@@ -270,61 +228,6 @@ const Observable = class extends EventController {
 	}
 	
 	/**
-	 * Utility for deeply running JSEN expressions on the instance.
-	 *
-	 * @param string			expr
-	 * @param object			params
-	 *
-	 * @return mixed
-	 */
-	jsenEval(expr, params = {}) {
-		var exprObj = Jsen.parse(expr, null, params);
-		if (exprObj) {
-			return exprObj.eval(this, this.jsenGetter());;
-		}
-	}
-	
-	/**
-	 * A getter callback for JSEN evaluators.
-	 *
-	 * @param array 		vars
-	 *
-	 * @return function
-	 */
-	jsenGetter(vars = []) {
-		return ((caller, context, name, args = []) => {
-			if (caller instanceof CallInterface || caller instanceof ReferenceInterface) {
-				if (!caller.isContext) {
-					vars.push(caller);
-				}
-				var value, advance = true;
-				var _contexts = context instanceof Contexts ? context.slice() : [context];
-				var __contexts = _contexts.slice();
-				while(_isUndefined(value) && advance && _contexts.length) {
-					var cntxt = _contexts.pop();
-					if (_isObservable(cntxt)) {
-						value = cntxt.get(name);
-					} else if (cntxt) {
-						value = cntxt[name];
-					}
-					if ((caller instanceof CallInterface) && !_isUndefined(value)) {
-						if (!_isFunction(value)) {
-							this.error(name + '() is not callable in the expression ' + caller.toString() + '!');
-						}
-						value = value.apply(cntxt, args);
-						advance = false;
-					}
-				}
-				if (advance && caller instanceof CallInterface) {
-					this.error('"' + caller + '" is not a function. (Called on ' + __contexts.map(c => typeof c).join(', ') + ')');
-				}
-				return value;
-			}
-			this.error('Operation "' + caller + '" is not supported!');
-		});
-	}
-	
-	/**
 	 * Determins if to fire the listener at entry "i".
 	 * Returns a data object if so.
 	 *
@@ -344,7 +247,7 @@ const Observable = class extends EventController {
 			e.$._CACHE = {};
 		}
 		var listenerParams = listener.params || {};
-		(!_isNull(listener.eventNames) ? _from(listener.eventNames) : eventNames).forEach(prop => {
+		(!_isNull(listener.eventNames) ? _arrFrom(listener.eventNames) : eventNames).forEach(prop => {
 			if (!(prop in e.$.CACHE)) {
 				e.$.CACHE[prop] = {};
 				e.$._CACHE[prop] = {};
@@ -418,6 +321,26 @@ const Observable = class extends EventController {
 	}
 
 	/**
+	 * Sets a reference to the parent instance.
+	 *
+	 * @param object|null		offsetParent
+	 *
+	 * @return this
+	 */
+	setOffsetParent(offsetParent) {
+		this.$.offsetParent = offsetParent;
+	}
+
+	/**
+	 * Sets a reference to the parent instance.
+	 *
+	 * @return object|null
+	 */
+	getOffsetParent() {
+		return this.$.offsetParent;
+	}
+
+	/**
 	 * Creates a function that observes changes in child observables and bubble them up here.
 	 *
 	 * @param string		name
@@ -432,7 +355,7 @@ const Observable = class extends EventController {
 			_e._context = this.$._state;
 			_e.entries = (e.entries || []).slice();
 			_e.exits = (e.exits || []).slice();
-			_e.bubbling = (e.bubbling ? _from(e.bubbling) : Object.keys(changes))
+			_e.bubbling = (e.bubbling ? _arrFrom(e.bubbling) : Object.keys(changes))
 				.map(subFieldName => prop + '.' + subFieldName);
 			return this.fire(prop, _e);
 		};

@@ -2,9 +2,7 @@
 /**
  * @imports
  */
-import {
-	_each
-} from '@onephrase/commons/src/Obj.js';
+import _each from '@onephrase/commons/obj/each.js';
 
 /**
  * ---------------------------

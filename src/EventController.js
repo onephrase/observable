@@ -2,26 +2,19 @@
 /**
  * @imports
  */
-import {
-	_even,
-	_get
-} from '@onephrase/commons/src/Obj.js';
-import {
-	_remove,
-	_concatUnique,
-	_from,
-	_difference,
-	_intersect,
-	_exclude,
-	_from as _arr_from
-} from '@onephrase/commons/src/Arr.js';
-import {
-	_isNull,
-	_isFunction,
-	_getType,
-	_isString,
-	_isArray
-} from '@onephrase/commons/src/Js.js';
+import _even from '@onephrase/commons/obj/even.js';
+import _get from '@onephrase/commons/obj/get.js';
+import _remove from '@onephrase/commons/arr/remove.js';
+import _concatUnique from '@onephrase/commons/arr/concatUnique.js';
+import _arrFrom from '@onephrase/commons/arr/from.js';
+import _difference from '@onephrase/commons/arr/difference.js';
+import _intersect from '@onephrase/commons/arr/intersect.js';
+import _exclude from '@onephrase/commons/arr/exclude.js';
+import _isNull from '@onephrase/commons/js/isNull.js';
+import _isFunction from '@onephrase/commons/js/isFunction.js';
+import _getType from '@onephrase/commons/js/getType.js';
+import _isString from '@onephrase/commons/js/isString.js';
+import _isArray from '@onephrase/commons/js/isArray.js';
 import Event from './Event.js';
 
 /**
@@ -95,7 +88,7 @@ const EventController = class {
 		}
 		var success = false;
 		for (var i = 0; i < this.$.listeners.length; i ++) {
-			if ((_isNull(eventNames) || _even(_arr_from(this.$.listeners[i].eventNames), _arr_from(eventNames))) 
+			if ((_isNull(eventNames) || _even(_arrFrom(this.$.listeners[i].eventNames), _arrFrom(eventNames))) 
 			&& (_isNull(callback) || this.$.listeners[i].callback === callback)
 			&& (_isNull(params) || _even(this.$.listeners[i].params, params))
 			&& (_isNull(tag) || this.$.listeners[i].tag === tag)) {
@@ -118,7 +111,7 @@ const EventController = class {
 		var eventsAll = [];
 		(this.$.listeners || []).forEach(listener => {
 			if (!_isNull(listener.eventNames)) {
-				eventsAll = _concatUnique(eventsAll, _from(listener.eventNames));
+				eventsAll = _concatUnique(eventsAll, _arrFrom(listener.eventNames));
 			}
 		});
 		return eventsAll;
@@ -135,7 +128,7 @@ const EventController = class {
 	fire(eventNames, details) {
 		var e = details instanceof Event ? details : new Event(details);
 		// We handle multiple events actually...
-		eventNames = _from(eventNames);
+		eventNames = _arrFrom(eventNames);
 		// And fields already firing should trigger a refire
 		this.$.currentlyFiring = this.$.currentlyFiring || [];
 		var eventNamesAntiRecursion = _difference(eventNames, this.$.currentlyFiring);
@@ -150,7 +143,7 @@ const EventController = class {
 			}
 			var listener = this.$.listeners[i];
 			var listenerParams = listener.params || {};
-			var listenerEventNames = _from(listener.eventNames).map(str => str.replace(/\`/g, ''));
+			var listenerEventNames = _arrFrom(listener.eventNames).map(str => str.replace(/\`/g, ''));
 			// --------------------------
 			// Level-1 filtering...
 			// Match listenerEventNames to firingEventNames
@@ -219,7 +212,7 @@ const EventController = class {
 			// Call listener...
 			var data = [];
 			var _data = [];
-			var result = _from(listener.eventNames).forEach(eventName => {
+			var result = _arrFrom(listener.eventNames).forEach(eventName => {
 				eventName = _isString(eventName) ? eventName.split('.') : eventName;
 				data.push(_get(context, eventName));
 				_data.push(_get(_context, eventName));
